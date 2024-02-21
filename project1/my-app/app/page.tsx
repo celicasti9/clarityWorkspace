@@ -10,6 +10,24 @@ export default function Home() {
   const userSession = new UserSession({ appConfig });
 
   useEffect(() => {
+    const intervalId = setInterval(() => {
+      const txid = JSON.parse(localStorage.getItem("txid"));
+      if (txid) {
+        fetch(`https://blockstream.info/testnet/api/tx/${txid}/status`)
+          .then((response) => response.json())
+          .then((status) => {
+            if (status.confirmed) {
+              localStorage.setItem("txStatus", "confirmed");
+              clearInterval(intervalId);
+            }
+          })
+          .catch((err) => console.error(err));
+      }
+    }, 10000);
+    return () => clearInterval(intervalId); // Clean up on component unmount
+  }, []);
+
+  useEffect(() => {
     if (userSession.isSignInPending()) {
       userSession.handlePendingSignIn().then((userData) => {
         setUserData(userData);
@@ -56,11 +74,17 @@ export default function Home() {
     localStorage.setItem("txStatus", "pending");
   };
 
-  const mintBitbadge = async () => {
-    // Placeholder function to be filled in Part 3
-  };
-
   const getButtonState = () => {
+    if (localStorage.getItem("txid")) {
+      if (localStorage.getItem("txStatus") == "pending") {
+        return {
+          text: "Transaction Pending",
+          onClick: null,
+          disabled: true,
+          instructions: "Step 2: Wait for your transaction to confirm",
+        };
+      }
+    }
     return {
       text: "Reserve Your Bitbadge",
       onClick: reserveBitbadge,
@@ -84,16 +108,13 @@ export default function Home() {
           {(() => {
             const buttonState = getButtonState();
             return (
-              <>
-                <p className="text-xl text-white">{buttonState.instructions}</p>
-                <button
-                  className="px-4 py-2 mt-4 text-lg font-bold text-white bg-indigo-600 rounded hover:bg-indigo-500"
-                  onClick={buttonState.onClick}
-                  disabled={buttonState.disabled}
-                >
-                  {buttonState.text}
-                </button>
-              </>
+              <button
+                className="px-4 py-2 mt-4 text-lg font-bold text-white bg-indigo-600 rounded hover:bg-indigo-500"
+                onClick={buttonState.onClick}
+                disabled={buttonState.disabled}
+              >
+                {buttonState.text}
+              </button>
             );
           })()}
           <button
@@ -105,5 +126,5 @@ export default function Home() {
         </>
       )}
     </main>
-  )
-};
+  );
+}
