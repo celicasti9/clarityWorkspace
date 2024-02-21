@@ -1,4 +1,3 @@
-
 {
   "name": "project1-tests",
   "version": "1.0.0",
@@ -14,7 +13,11 @@
   "license": "ISC",
   "dependencies": {
     "@hirosystems/clarinet-sdk": "^1.0.0",
-    "@stacks/transactions": "^6.9.0",
+    "@stacks/common": "^6.10.0",
+    "@stacks/connect": "^7.7.0",
+    "@stacks/network": "^6.11.3",
+    "@stacks/transactions": "^6.11.3",
+    "bitcoinjs-lib": "^6.1.5",
     "chokidar-cli": "^3.0.0",
     "typescript": "^5.2.2",
     "vite": "^5.0.6",
